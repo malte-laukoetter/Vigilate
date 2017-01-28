@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Vigilate:jar">
+    <output-path>$PROJECT_DIR$/../TestServer/Forge/mods</output-path>
+    <root id="archive" name="Vigilate.jar">
+      <element id="module-output" name="Vigilate" />
+    </root>
+  </artifact>
+</component>
