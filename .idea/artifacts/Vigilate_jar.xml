@@ -3,6 +3,7 @@
     <output-path>$PROJECT_DIR$/../TestServer/Forge/mods</output-path>
     <root id="archive" name="Vigilate.jar">
       <element id="module-output" name="Vigilate" />
+      <element id="dir-copy" path="$PROJECT_DIR$/src/main/resources" />
     </root>
   </artifact>
 </component>

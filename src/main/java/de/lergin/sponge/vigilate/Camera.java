@@ -3,6 +3,8 @@ package de.lergin.sponge.vigilate;
 import de.lergin.sponge.vigilate.data.ViewerData;
 import de.lergin.sponge.vigilate.data.VigilateKeys;
 import de.lergin.sponge.vigilate.data.ViewerDataManipulatorBuilder;
+import ninja.leaping.configurate.objectmapping.Setting;
+import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.key.Keys;
@@ -17,11 +19,20 @@ import org.spongepowered.api.world.World;
 
 import java.util.Optional;
 
+@ConfigSerializable
 public class Camera {
+    @Setting(value = "location", comment = "Location of the camera")
     private Location<World> loc;
+    @Setting(value = "Name", comment = "Name of the camera")
     private Text name;
+    @Setting(value = "id", comment = "Id of the camera")
     private String id;
+    @Setting(value = "permission", comment = "Permission needed to use the camera")
     private String permission;
+
+    public Camera(){
+        this(new Location<>(Sponge.getServer().getWorld(Sponge.getServer().getDefaultWorldName()).get(), 0, 0, 0), "");
+    }
 
     public Camera(Location<World> loc, String id) {
         this.loc = loc;
@@ -65,9 +76,15 @@ public class Camera {
     }
 
     public void viewCamera(Player player){
-        if (!player.supports(VigilateKeys.OLD_GAME_MODE)) {
-            player.offer(new ViewerDataManipulatorBuilder().create());
+        if (player.supports(VigilateKeys.OLD_GAME_MODE)) {
+            player.get(VigilateKeys.CAMERA).orElse("");
+
+            if(Vigilate.getInstance().getCameras().containsKey(id)){
+                Vigilate.getInstance().getCameras().get(id).endViewCamera(player);
+            }
         }
+
+        player.offer(new ViewerDataManipulatorBuilder().create());
 
         player.getValue(Keys.GAME_MODE).ifPresent(
                 (value -> player.offer(VigilateKeys.OLD_GAME_MODE, value.get()))
@@ -97,7 +114,6 @@ public class Camera {
         player.offer(VigilateKeys.OLD_LOCATION_Z, player.getLocation().getZ());
 
         player.offer(Keys.GAME_MODE, GameModes.ADVENTURE);
-        player.offer(Keys.IS_FLYING, true);
         player.offer(Keys.AFFECTS_SPAWNING, false);
         player.offer(Keys.VANISH, true);
         player.offer(Keys.VANISH_PREVENTS_TARGETING, true);
@@ -155,5 +171,6 @@ public class Camera {
             player.remove(ViewerData.class);
         }
 
+        player.sendMessage(Text.of("Ended Camera view"));
     }
 }
