@@ -24,7 +24,7 @@ import java.util.Optional;
 public class Camera {
     @Setting(value = "location", comment = "Location of the camera")
     private Location<World> loc;
-    @Setting(value = "Name", comment = "Name of the camera")
+    @Setting(value = "name", comment = "Name of the camera")
     private Text name;
     @Setting(value = "id", comment = "Id of the camera")
     private String id;
@@ -51,6 +51,10 @@ public class Camera {
     }
 
     public Text getName() {
+        if(name == null){
+            return Text.EMPTY;
+        }
+
         return name;
     }
 
@@ -76,10 +80,6 @@ public class Camera {
 
     public void setPermission(String permission) {
         this.permission = permission;
-    }
-
-    public void placeInWorld(){
-        this.getLocation().setBlockType(BlockTypes.GLASS, BlockChangeFlag.NONE, Cause.of(NamedCause.source(Vigilate.getPluginContainer())));
     }
 
     public void viewCamera(Player player){

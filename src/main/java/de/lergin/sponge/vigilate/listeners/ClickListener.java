@@ -9,7 +9,6 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.action.InteractEvent;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.filter.data.Has;
-import org.spongepowered.api.text.Text;
 
 import java.util.Optional;
 

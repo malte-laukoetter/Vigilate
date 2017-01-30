@@ -19,13 +19,8 @@ import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.asset.Asset;
 import org.spongepowered.api.config.DefaultConfig;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.filter.Getter;
-import org.spongepowered.api.event.game.state.GameInitializationEvent;
-import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
-import org.spongepowered.api.event.game.state.GameStartingServerEvent;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
+import org.spongepowered.api.event.game.state.*;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.world.Location;
@@ -133,7 +128,7 @@ public class Vigilate {
             }
         });
 
-        logger.info("Loaded {0} Cameras", cameras.size());
+        logger.info(String.format("Loaded %d Cameras", cameras.size()));
 
         CommandRegister.registerCommands(this);
     }
@@ -151,15 +146,24 @@ public class Vigilate {
     }
 
     @Listener
-    public void onPlayerJoin(ClientConnectionEvent.Join event, @Getter("getTargetEntity") Player player) {
-       // cam = new Camera(new Location<>(player.getWorld(), 255, 70, 255), "test");
-//        System.out.println(config.getLocation());
+    public void onGameServerStopping(GameStoppingServerEvent event) {
+        config.removeChild("cameras");
 
+        getCameras().values().forEach((cam)->{
+            try {
+                config.getNode("cameras").getAppendedNode().setValue(TypeToken.of(Camera.class), cam);
+            } catch (ObjectMappingException e) {
+                e.printStackTrace();
+            }
+        });
 
-      //  cam.placeInWorld();
-      //  cam.viewCamera(player);
+        try {
+            loader.save(config);
+            logger.warn("Saved the config!");
+        } catch(IOException e) {
+            logger.warn("Could not save the config!");
+        }
     }
-
 
     private void useDefaultConfig() throws IOException, ObjectMappingException {
         try {

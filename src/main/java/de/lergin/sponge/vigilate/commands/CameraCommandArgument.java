@@ -20,17 +20,6 @@ public class CameraCommandArgument extends CommandElement {
         this.plugin = plugin;
     }
 
-    /**
-     * Attempt to extract a value for this element from the given arguments.
-     * This method is expected to have no side-effects for the source, meaning
-     * that executing it will not change the state of the {@link CommandSource}
-     * in any way.
-     *
-     * @param source The source to parse for
-     * @param args   the arguments
-     * @return The extracted value
-     * @throws ArgumentParseException if unable to extract a value
-     */
     @Nullable
     @Override
     protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
@@ -43,25 +32,15 @@ public class CameraCommandArgument extends CommandElement {
         throw args.createError(Text.of("Unknown Camera Id"));
     }
 
-    /**
-     * Fetch completions for command arguments.
-     *
-     * @param src     The source requesting tab completions
-     * @param args    The arguments currently provided
-     * @param context The context to store state in
-     * @return Any relevant completions
-     */
     @Override
     public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
-        Set<String> camIds = new HashSet<>(plugin.getCameras().keySet());
+        List<String> camIds = new ArrayList<>(plugin.getCameras().keySet());
         Optional<String> arg = args.nextIfPresent();
 
         if(arg.isPresent()){
             camIds.removeIf((camId) -> !camId.startsWith(arg.get().toLowerCase()));
         }
 
-        System.out.println(plugin.getCameras());
-
-        return new ArrayList<> (camIds);
+        return camIds;
     }
 }
