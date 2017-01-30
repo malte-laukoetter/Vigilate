@@ -1,5 +1,6 @@
 package de.lergin.sponge.vigilate.commands;
 
+import de.lergin.sponge.vigilate.Camera;
 import de.lergin.sponge.vigilate.Vigilate;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -19,13 +20,9 @@ public class ViewCameraCommand implements CommandExecutor {
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         if(src instanceof Player){
-            String id = args.<String>getOne("id").orElseThrow(() -> new CommandException(Text.of("No Camera Id")));
+            Camera cam = args.<Camera>getOne("camera").orElseThrow(() -> new CommandException(Text.of("Unknown Camera")));
 
-            if(!plugin.getCameras().containsKey(id)){
-                throw new CommandException(Text.of("Unknown Camera Id"));
-            }
-
-            plugin.getCameras().get(id).viewCamera((Player) src);
+            cam.viewCamera((Player) src);
         } else {
             throw new CommandException(Text.of("Only Players can view Cameras"));
         }

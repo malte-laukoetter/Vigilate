@@ -38,7 +38,7 @@ public class CommandRegister {
                 .permission("vigilate.view")
                 .arguments(
                         GenericArguments.onlyOne(
-                                GenericArguments.string(Text.of("id"))
+                                new CameraCommandArgument(Text.of("camera"), plugin)
                         )
                 )
                 .executor(new ViewCameraCommand(plugin))

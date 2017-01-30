@@ -1,17 +1,19 @@
 package de.lergin.sponge.vigilate;
 
+import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import de.lergin.sponge.vigilate.commands.CommandRegister;
-import de.lergin.sponge.vigilate.config.Config;
 import de.lergin.sponge.vigilate.data.ImmutableViewerDataManipulator;
 import de.lergin.sponge.vigilate.data.ViewerData;
 import de.lergin.sponge.vigilate.data.ViewerDataManipulatorBuilder;
 import de.lergin.sponge.vigilate.listeners.*;
+import de.lergin.sponge.vigilate.utils.LocationSerializer;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
@@ -20,11 +22,13 @@ import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.filter.Getter;
+import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
-import org.spongepowered.api.event.game.state.GameStartedServerEvent;
+import org.spongepowered.api.event.game.state.GameStartingServerEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.world.Location;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -43,8 +47,6 @@ import java.util.Map;
 )
 public class Vigilate {
     private static Vigilate instance;
-
-    public static Camera cam;
 
     public static Vigilate getInstance() {
         return instance;
@@ -65,31 +67,33 @@ public class Vigilate {
     @Inject
     private Logger logger;
 
+    public Logger getLogger() {
+        return logger;
+    }
+
     @Inject
     private PluginContainer container;
 
     @Inject
+    private
     Game game;
 
     @Inject
     @DefaultConfig(sharedRoot = false)
+    private
     Path path;
     @Inject
     @DefaultConfig(sharedRoot = false)
+    private
     ConfigurationLoader<CommentedConfigurationNode> loader;
-    Config config;
+
+    private ConfigurationNode config;
 
     @Listener
-    public void onServerStarting(GamePreInitializationEvent event) {
+    public void onGamePreInitialization(GamePreInitializationEvent event) throws IOException, ObjectMappingException {
         Sponge.getDataManager().register(ViewerData.class, ImmutableViewerDataManipulator.class,
                 new ViewerDataManipulatorBuilder());
 
-        CommandRegister.registerCommands(this);
-    }
-
-    @Listener
-    public void onGamePreInitializationEvent(GamePreInitializationEvent event)
-            throws IOException, ObjectMappingException {
         Asset conf = game.getAssetManager().getAsset(this, "config.conf").get();
         if (!Files.exists(path)) {
             try {
@@ -99,38 +103,45 @@ public class Vigilate {
                 try {
                     throw ex;
                 } finally {
-                    mapDefault();
+                    useDefaultConfig();
                 }
             }
         }
-        ConfigurationNode root;
+
         try {
-            root = loader.load();
+            config = loader.load();
         } catch (IOException ex) {
             logger.error("Could not load the config file!");
             try {
                 throw ex;
             } finally {
-                mapDefault();
-            }
-        }
-        try {
-            config = root.getValue(Config.type);
-        } catch (ObjectMappingException ex) {
-            logger.error("Invalid config file!");
-            try {
-                throw ex;
-            } finally {
-                mapDefault();
+                useDefaultConfig();
             }
         }
     }
 
     @Listener
-    public void onServerStart(GameStartedServerEvent event) {
+    public void onGameStartingServer(GameStartingServerEvent event) {
+        TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(Location.class), new LocationSerializer());
+
+        config.getNode("cameras").getChildrenList().forEach((node) -> {
+            try {
+                Camera cam = node.getValue(TypeToken.of(Camera.class));
+                cameras.put(cam.getId(), cam);
+            } catch (ObjectMappingException e) {
+                logger.warn("Couldn't load Camera: " + e.getMessage());
+            }
+        });
+
+        logger.info("Loaded {0} Cameras", cameras.size());
+
+        CommandRegister.registerCommands(this);
+    }
+
+    @Listener
+    public void onGameInitialization(GameInitializationEvent event) {
         instance = this;
         pluginContainer = container;
-
 
         Sponge.getEventManager().registerListeners(this, new ClickListener());
         Sponge.getEventManager().registerListeners(this, new DropListener());
@@ -142,24 +153,25 @@ public class Vigilate {
     @Listener
     public void onPlayerJoin(ClientConnectionEvent.Join event, @Getter("getTargetEntity") Player player) {
        // cam = new Camera(new Location<>(player.getWorld(), 255, 70, 255), "test");
-        System.out.println(config.version);
+//        System.out.println(config.getLocation());
+
 
       //  cam.placeInWorld();
       //  cam.viewCamera(player);
     }
 
 
-    private void mapDefault() throws IOException, ObjectMappingException {
+    private void useDefaultConfig() throws IOException, ObjectMappingException {
         try {
-            config = loadDefault().getValue(Config.type);
-        } catch (IOException | ObjectMappingException ex) {
+            config = loadDefaultConfig();
+        } catch (IOException ex) {
             logger.error("Could not load the embedded default config! Disabling plugin.");
             game.getEventManager().unregisterPluginListeners(this);
             throw ex;
         }
     }
 
-    private ConfigurationNode loadDefault() throws IOException {
+    private ConfigurationNode loadDefaultConfig() throws IOException {
         return HoconConfigurationLoader.builder()
                 .setURL(game.getAssetManager().getAsset(this, "config.conf").get().getUrl()).build()
                 .load(loader.getDefaultOptions());

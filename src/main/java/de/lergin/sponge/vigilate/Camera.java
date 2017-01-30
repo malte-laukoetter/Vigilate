@@ -32,12 +32,12 @@ public class Camera {
     private String permission;
 
     public Camera(){
-        this(new Location<>(Sponge.getServer().getWorld(Sponge.getServer().getDefaultWorldName()).get(), 0, 0, 0), "");
+
     }
 
     public Camera(Location<World> loc, String id) {
         this.loc = loc;
-        this.id = id;
+        this.id = id.toLowerCase();
 
         Vigilate.getInstance().getCameras().put(id, this);
     }
@@ -63,7 +63,11 @@ public class Camera {
     }
 
     public void setId(String id) {
-        this.id = id;
+        Vigilate.getInstance().getCameras().remove(this.id);
+
+        this.id = id.toLowerCase();
+
+        Vigilate.getInstance().getCameras().put(this.id, this);
     }
 
     public String getPermission() {
