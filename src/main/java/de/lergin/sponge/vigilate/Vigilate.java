@@ -6,9 +6,7 @@ import de.lergin.sponge.vigilate.config.Config;
 import de.lergin.sponge.vigilate.data.ImmutableViewerDataManipulator;
 import de.lergin.sponge.vigilate.data.ViewerData;
 import de.lergin.sponge.vigilate.data.ViewerDataManipulatorBuilder;
-import de.lergin.sponge.vigilate.listeners.ClickListener;
-import de.lergin.sponge.vigilate.listeners.DropListener;
-import de.lergin.sponge.vigilate.listeners.PickUpListener;
+import de.lergin.sponge.vigilate.listeners.*;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
@@ -27,7 +25,6 @@ import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.world.Location;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -138,15 +135,17 @@ public class Vigilate {
         Sponge.getEventManager().registerListeners(this, new ClickListener());
         Sponge.getEventManager().registerListeners(this, new DropListener());
         Sponge.getEventManager().registerListeners(this, new PickUpListener());
+        Sponge.getEventManager().registerListeners(this, new InteractInventoryListener());
+        Sponge.getEventManager().registerListeners(this, new MoveListener());
     }
 
     @Listener
     public void onPlayerJoin(ClientConnectionEvent.Join event, @Getter("getTargetEntity") Player player) {
-        cam = new Camera(new Location<>(player.getWorld(), 255, 100, 255), "test");
+       // cam = new Camera(new Location<>(player.getWorld(), 255, 70, 255), "test");
         System.out.println(config.version);
 
-        cam.placeInWorld();
-        cam.viewCamera(player);
+      //  cam.placeInWorld();
+      //  cam.viewCamera(player);
     }
 
 

@@ -13,6 +13,7 @@ import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.world.BlockChangeFlag;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -37,6 +38,8 @@ public class Camera {
     public Camera(Location<World> loc, String id) {
         this.loc = loc;
         this.id = id;
+
+        Vigilate.getInstance().getCameras().put(id, this);
     }
 
     public Location<World> getLocation() {
@@ -113,25 +116,32 @@ public class Camera {
         player.offer(VigilateKeys.OLD_LOCATION_Y, player.getLocation().getY());
         player.offer(VigilateKeys.OLD_LOCATION_Z, player.getLocation().getZ());
 
-        player.offer(Keys.GAME_MODE, GameModes.ADVENTURE);
+        player.offer(Keys.GAME_MODE, GameModes.CREATIVE);
         player.offer(Keys.AFFECTS_SPAWNING, false);
         player.offer(Keys.VANISH, true);
         player.offer(Keys.VANISH_PREVENTS_TARGETING, true);
         player.offer(Keys.VANISH_IGNORES_COLLISION, true);
         player.offer(Keys.FLYING_SPEED, 0.0);
+        player.offer(Keys.IS_FLYING, true);
 
         player.offer(VigilateKeys.CAMERA, this.getId());
 
-        System.out.println(player.get(VigilateKeys.OLD_FLYING_SPEED));
-        System.out.println(player.get(VigilateKeys.OLD_GAME_MODE));
+        player.setLocation(this.getLocation());
 
-        player.setLocation(this.getLocation().add(0.5,-1,0.5));
+        Title title = Title.builder().fadeIn(20).fadeOut(20).title(Text.EMPTY).subtitle(Text.of("Click to go back!")).stay(100000).build();
+        player.sendTitle(title);
     }
 
     public void endViewCamera(Player player){
         Optional<String> cameraId = player.get(VigilateKeys.CAMERA);
 
-        if (player.supports(VigilateKeys.OLD_GAME_MODE) && cameraId.isPresent() && !cameraId.get().equals("")) {
+        if (cameraId.isPresent() && !cameraId.get().equals("")) {
+            Camera.resetPlayer(player);
+        }
+    }
+
+    static public void resetPlayer(Player player){
+        if (player.supports(VigilateKeys.OLD_GAME_MODE)) {
 
             player.getValue(VigilateKeys.OLD_GAME_MODE).ifPresent(
                     (value -> player.offer(Keys.GAME_MODE, value.get()))
@@ -171,6 +181,7 @@ public class Camera {
             player.remove(ViewerData.class);
         }
 
+        player.clearTitle();
         player.sendMessage(Text.of("Ended Camera view"));
     }
 }
