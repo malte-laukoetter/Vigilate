@@ -1,4 +1,4 @@
-package de.lergin.sponge.vigilate.utils;
+package de.lergin.sponge.vigilate.config;
 
 import com.google.common.reflect.TypeToken;
 import ninja.leaping.configurate.ConfigurationNode;

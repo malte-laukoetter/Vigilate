@@ -7,7 +7,7 @@ import de.lergin.sponge.vigilate.data.ImmutableViewerDataManipulator;
 import de.lergin.sponge.vigilate.data.ViewerData;
 import de.lergin.sponge.vigilate.data.ViewerDataManipulatorBuilder;
 import de.lergin.sponge.vigilate.listeners.*;
-import de.lergin.sponge.vigilate.utils.LocationSerializer;
+import de.lergin.sponge.vigilate.config.LocationSerializer;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;

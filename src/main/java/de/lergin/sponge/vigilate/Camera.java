@@ -6,15 +6,12 @@ import de.lergin.sponge.vigilate.data.ViewerDataManipulatorBuilder;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.title.Title;
-import org.spongepowered.api.world.BlockChangeFlag;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -75,6 +72,10 @@ public class Camera {
     }
 
     public String getPermission() {
+        if(permission == null){
+            return "";
+        }
+
         return permission;
     }
 
@@ -83,6 +84,10 @@ public class Camera {
     }
 
     public void viewCamera(Player player){
+        if(!this.canUseCamera(player)){
+            return; // shouldn't have the ability to even execute the command
+        }
+
         if (player.supports(VigilateKeys.OLD_GAME_MODE)) {
             player.get(VigilateKeys.CAMERA).orElse("");
 
@@ -134,6 +139,8 @@ public class Camera {
 
         Title title = Title.builder().fadeIn(20).fadeOut(20).title(Text.EMPTY).subtitle(Text.of("Click to go back!")).stay(100000).build();
         player.sendTitle(title);
+
+        player.sendMessage(Text.of("Viewing Camera: ", this.getName()));
     }
 
     public void endViewCamera(Player player){
@@ -142,6 +149,10 @@ public class Camera {
         if (cameraId.isPresent() && !cameraId.get().equals("")) {
             Camera.resetPlayer(player);
         }
+    }
+
+    public Boolean canUseCamera(CommandSource src){
+        return this.getPermission().equals("") || src.hasPermission(this.getPermission());
     }
 
     static public void resetPlayer(Player player){

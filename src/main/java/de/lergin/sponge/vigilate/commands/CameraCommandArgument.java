@@ -1,5 +1,6 @@
 package de.lergin.sponge.vigilate.commands;
 
+import de.lergin.sponge.vigilate.Camera;
 import de.lergin.sponge.vigilate.Vigilate;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.ArgumentParseException;
@@ -22,11 +23,15 @@ public class CameraCommandArgument extends CommandElement {
 
     @Nullable
     @Override
-    protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
+    protected Object parseValue(CommandSource src, CommandArgs args) throws ArgumentParseException {
         String arg = args.next().toLowerCase();
 
         if(plugin.getCameras().containsKey(arg)){
-            return plugin.getCameras().get(arg);
+            Camera cam = plugin.getCameras().get(arg);
+
+            if(cam.canUseCamera(src)){
+                return cam;
+            }
         }
 
         throw args.createError(Text.of("Unknown Camera Id"));
@@ -34,13 +39,14 @@ public class CameraCommandArgument extends CommandElement {
 
     @Override
     public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
-        List<String> camIds = new ArrayList<>(plugin.getCameras().keySet());
+        Map<String, Camera> cams = new HashMap<>(plugin.getCameras());
         Optional<String> arg = args.nextIfPresent();
 
         if(arg.isPresent()){
-            camIds.removeIf((camId) -> !camId.startsWith(arg.get().toLowerCase()));
+            cams.entrySet().removeIf((cam) ->
+                    !cam.getKey().startsWith(arg.get().toLowerCase()) || !cam.getValue().canUseCamera(src));
         }
 
-        return camIds;
+        return new ArrayList<>(cams.keySet());
     }
 }
