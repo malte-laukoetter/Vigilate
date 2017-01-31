@@ -143,6 +143,7 @@ public class Vigilate {
         Sponge.getEventManager().registerListeners(this, new PickUpListener());
         Sponge.getEventManager().registerListeners(this, new InteractInventoryListener());
         Sponge.getEventManager().registerListeners(this, new MoveListener());
+        Sponge.getEventManager().registerListeners(this, new CommandListener());
     }
 
     @Listener

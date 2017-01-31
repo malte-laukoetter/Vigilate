@@ -20,6 +20,10 @@ public class InfoCameraCommand implements CommandExecutor {
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         Camera cam = args.<Camera>getOne("camera").orElseThrow(() -> new CommandException(Text.of("Unknown Camera")));
 
+        if(!cam.canUseCamera(src)) {
+            throw new CommandException(Text.of("Unknown Camera"));
+        }
+
         src.sendMessage(
                 Text.of("Camera Info - ", cam.getName(), Text.NEW_LINE,
                         "Id: ", cam.getId(), Text.NEW_LINE,
