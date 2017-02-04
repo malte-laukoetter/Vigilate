@@ -2,6 +2,7 @@ package de.lergin.sponge.vigilate;
 
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
+import de.lergin.sponge.vigilate.bstats.Metrics;
 import de.lergin.sponge.vigilate.commands.CommandRegister;
 import de.lergin.sponge.vigilate.data.ImmutableViewerDataManipulator;
 import de.lergin.sponge.vigilate.data.ViewerData;
@@ -34,7 +35,7 @@ import java.util.Map;
 @Plugin(
         id = "vigilate",
         name = "Vigilate",
-        version = "1.0-SNAPSHOT",
+        version = "1.0.1",
         description = "A security camera plugin",
         authors = {
                 "Lergin"
@@ -72,6 +73,9 @@ public class Vigilate {
     @Inject
     private
     Game game;
+
+    @Inject
+    private Metrics metrics;
 
     @Inject
     @DefaultConfig(sharedRoot = false)
@@ -131,6 +135,13 @@ public class Vigilate {
         logger.info(String.format("Loaded %d Cameras", cameras.size()));
 
         CommandRegister.registerCommands(this);
+
+        metrics.addCustomChart(new Metrics.SingleLineChart("cameras") {
+            @Override
+            public int getValue() {
+                return cameras.size();
+            }
+        });
     }
 
     @Listener

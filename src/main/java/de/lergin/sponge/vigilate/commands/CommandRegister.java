@@ -12,21 +12,13 @@ public class CommandRegister {
                 .description(Text.of("Creates a new Camera"))
                 .permission("vigilate.create")
                 .arguments(
-                        GenericArguments.onlyOne(
-                                GenericArguments.string(Text.of("id"))
-                        ),
-                        GenericArguments.onlyOne(
-                                GenericArguments.string(Text.of("Name"))
+                        GenericArguments.string(Text.of("id")),
+                        GenericArguments.string(Text.of("Name")),
+                        GenericArguments.optional(
+                                GenericArguments.location(Text.of("Location"))
                         ),
                         GenericArguments.optional(
-                                GenericArguments.onlyOne(
-                                        GenericArguments.location(Text.of("Location"))
-                                )
-                        ),
-                        GenericArguments.optional(
-                                GenericArguments.onlyOne(
-                                        GenericArguments.string(Text.of("Permission"))
-                                )
+                                GenericArguments.string(Text.of("Permission"))
                         )
                 )
                 .executor(new CreateCameraCommand(plugin))
@@ -36,9 +28,7 @@ public class CommandRegister {
                 .description(Text.of("Views a Camera"))
                 .permission("vigilate.view")
                 .arguments(
-                        GenericArguments.onlyOne(
-                                new CameraCommandArgument(Text.of("camera"), plugin)
-                        )
+                        new CameraCommandArgument(Text.of("camera"), plugin)
                 )
                 .executor(new ViewCameraCommand(plugin))
                 .build();
@@ -47,9 +37,7 @@ public class CommandRegister {
                 .description(Text.of("Shows Infos about a Camera"))
                 .permission("vigilate.info")
                 .arguments(
-                        GenericArguments.onlyOne(
-                                new CameraCommandArgument(Text.of("camera"), plugin)
-                        )
+                        new CameraCommandArgument(Text.of("camera"), plugin)
                 )
                 .executor(new InfoCameraCommand(plugin))
                 .build();

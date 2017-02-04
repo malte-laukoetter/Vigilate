@@ -52,8 +52,7 @@ public class CreateCameraCommand implements CommandExecutor {
 
         plugin.getCameras().put(id, camera);
 
-        src.sendMessage(Text.of("Successful created camera ", TextStyles.ITALIC, TextColors.GREEN, id,
-                TextStyles.RESET, TextColors.RESET, "!"));
+        src.sendMessage(Text.of("Successful created camera ", Text.of(TextStyles.ITALIC, TextColors.GREEN, id), "!"));
 
         if(camera.canUseCamera(src)){
             src.sendMessage(Text.of(TextStyles.ITALIC,
