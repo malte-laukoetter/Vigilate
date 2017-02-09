@@ -51,6 +51,7 @@ public class CreateCameraCommand implements CommandExecutor {
         }
 
         plugin.getCameras().put(id, camera);
+        plugin.getConfig().save();
 
         src.sendMessage(Text.of("Successful created camera ", Text.of(TextStyles.ITALIC, TextColors.GREEN, id), "!"));
 

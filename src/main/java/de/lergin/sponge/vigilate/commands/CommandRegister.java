@@ -24,6 +24,15 @@ public class CommandRegister {
                 .executor(new CreateCameraCommand(plugin))
                 .build();
 
+        CommandSpec deleteCameraCommand = CommandSpec.builder()
+                .description(Text.of("Deletes a Camera"))
+                .permission("vigilate.delete")
+                .arguments(
+                        new CameraCommandArgument(Text.of("camera"), plugin)
+                )
+                .executor(new DeleteCameraCommand(plugin))
+                .build();
+
         CommandSpec viewCameraCommand = CommandSpec.builder()
                 .description(Text.of("Views a Camera"))
                 .permission("vigilate.view")
@@ -48,11 +57,19 @@ public class CommandRegister {
                 .executor(new ListCamerasCommand(plugin))
                 .build();
 
+        CommandSpec reloadCommand = CommandSpec.builder()
+                .description(Text.of("Reloads the Configuration"))
+                .permission("vigilate.reload")
+                .executor(new ReloadCommand(plugin))
+                .build();
+
         CommandSpec vigilateCommand = CommandSpec.builder()
                 .child(viewCameraCommand, "view")
                 .child(createCameraCommand, "create")
+                .child(deleteCameraCommand, "delete")
                 .child(listCamerasCommand, "list")
                 .child(infoCameraCommand, "info")
+                .child(reloadCommand, "reload")
                 .build();
 
         Sponge.getGame().getCommandManager().register(plugin, vigilateCommand, "camera", "vigilate");
