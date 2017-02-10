@@ -141,11 +141,10 @@ public class Camera {
 
         player.setLocation(this.getLocation());
 
-        System.out.println(plugin);
-
         Title title = Title.builder()
                 .fadeIn(20)
                 .fadeOut(20)
+                .title(Text.EMPTY)
                 .subtitle(plugin.translations.CAMERA_VIEW_TITLE.apply(this.templateVariables()).toText())
                 .stay(100000)
                 .build();

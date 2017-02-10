@@ -1,6 +1,5 @@
 package de.lergin.sponge.vigilate.commands;
 
-import com.google.common.collect.ImmutableMap;
 import de.lergin.sponge.vigilate.Camera;
 import de.lergin.sponge.vigilate.Vigilate;
 import org.spongepowered.api.command.CommandException;
@@ -11,8 +10,6 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
-import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 

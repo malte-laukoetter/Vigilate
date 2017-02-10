@@ -29,7 +29,7 @@ import java.util.Map;
 @Plugin(
         id = "vigilate",
         name = "Vigilate",
-        version = "1.0.1",
+        version = "1.0.2",
         description = "A security camera plugin",
         authors = {
                 "Lergin"
