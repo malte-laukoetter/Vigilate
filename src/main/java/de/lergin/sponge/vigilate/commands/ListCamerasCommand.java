@@ -7,6 +7,7 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.service.pagination.PaginationList;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
@@ -27,16 +28,16 @@ public class ListCamerasCommand implements CommandExecutor {
         List<Camera> cams = new ArrayList<>(plugin.getCameras().values());
         cams.removeIf((cam)-> !cam.canUseCamera(src));
 
-        Iterable<Text> texts = cams.parallelStream().map((cam)-> Text.builder().append(cam.getName())
-                .onClick(TextActions.runCommand("/vigilate view " + cam.getId()))
-                .onHover(TextActions.showText(Text.of(
-                        cam.getLocation().getBlockX(), "/",
-                        cam.getLocation().getBlockY(), "/",
-                        cam.getLocation().getBlockZ())))
-                .build()).collect(Collectors.toList());
+        Iterable<Text> texts = cams.parallelStream().map((cam)->
+                plugin.translations.CAMERA_LIST_ITEM.apply(cam.templateVariables())
+                .onHover(TextActions.showText(
+                        plugin.translations.CAMERA_LIST_ITEM_HOVER.apply(cam.templateVariables()).build()
+                ))
+                .onClick(TextActions.runCommand("/camera view " + cam.getId())).build()
+        ).collect(Collectors.toList());
 
         PaginationList.builder()
-                .title(Text.of("Cameras"))
+                .title(plugin.translations.CAMERA_LIST_TITLE)
                 .contents(texts)
                 .sendTo(src);
 

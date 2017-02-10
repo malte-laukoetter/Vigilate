@@ -25,7 +25,7 @@ public class DeleteCameraCommand implements CommandExecutor {
         plugin.getCameras().remove(cam.getId());
         plugin.getConfig().save();
 
-        src.sendMessage(Text.of("Successful deleted camera ", Text.of(TextStyles.ITALIC, TextColors.GREEN, cam.getId()), "!"));
+        src.sendMessage(plugin.translations.CAMERA_DELTED, cam.templateVariables());
 
         return CommandResult.success();
     }

@@ -8,11 +8,14 @@ import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
+import ninja.leaping.configurate.objectmapping.serialize.TypeSerializerCollection;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.asset.Asset;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -39,6 +42,21 @@ public class Config {
      * saves the configuration of the plugin
      */
     public void save() {
+        try {
+            config.getNode("translations").setValue(TypeToken.of(TranslationConfig.class), plugin.translations);
+        } catch (ObjectMappingException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            loader.save(config);
+            plugin.getLogger().warn("Saved the config!");
+        } catch(IOException e) {
+            logger.warn("Could not save the config!");
+        }
+    }
+
+    public void saveCameras(){
         config.removeChild("cameras");
 
         plugin.getCameras().values().forEach((cam)->{
@@ -48,13 +66,6 @@ public class Config {
                 e.printStackTrace();
             }
         });
-
-        try {
-            loader.save(config);
-            plugin.getLogger().warn("Saved the config!");
-        } catch(IOException e) {
-            logger.warn("Could not save the config!");
-        }
     }
 
     /**
@@ -94,22 +105,40 @@ public class Config {
         }
     }
 
+    public void loadTranslations() {
+        try {
+            TranslationConfig trans = config.getNode("translations").getValue(TypeToken.of(TranslationConfig.class));
+
+            if (trans != null) {
+                plugin.translations = trans;
+                logger.info("Loaded Translations");
+            }else {
+                plugin.translations = new TranslationConfig();
+            }
+        } catch (ObjectMappingException e) {
+            logger.warn("Couldn't load Translations: " + e.getMessage());
+            plugin.translations = new TranslationConfig();
+        }
+    }
+
     /**
      * loads the cameras from the config
      *
      * may only be called after the worlds of the server have been loaded
      */
     public void loadCameras() {
+        plugin.getCameras().clear();
+
         // yes i know it is bad to register it every time the config is loaded but i doesn't seem to work otherwise...
         TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(Location.class), new LocationSerializer());
-
-        plugin.getCameras().clear();
 
         config.getNode("cameras").getChildrenList().forEach((node) -> {
             try {
                 Camera cam = node.getValue(TypeToken.of(Camera.class));
+                cam.setLocation(node.getNode("location").getValue(TypeToken.of(Location.class)));
                 plugin.getCameras().put(cam.getId(), cam);
             } catch (ObjectMappingException e) {
+                System.out.println(TypeSerializers.getDefaultSerializers().get(TypeToken.of(Location.class)));
                 logger.warn("Couldn't load Camera: " + e.getMessage());
             }
         });

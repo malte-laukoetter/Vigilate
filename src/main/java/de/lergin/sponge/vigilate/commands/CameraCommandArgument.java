@@ -1,5 +1,6 @@
 package de.lergin.sponge.vigilate.commands;
 
+import com.google.common.collect.ImmutableMap;
 import de.lergin.sponge.vigilate.Camera;
 import de.lergin.sponge.vigilate.Vigilate;
 import org.spongepowered.api.command.CommandSource;
@@ -34,7 +35,11 @@ public class CameraCommandArgument extends CommandElement {
             }
         }
 
-        throw args.createError(Text.of("Unknown Camera Id"));
+        throw args.createError(
+                plugin.translations.UNKNOWN_CAMERA_ID.apply(
+                        ImmutableMap.of("camera.id", arg)
+                ).build()
+        );
     }
 
     @Override

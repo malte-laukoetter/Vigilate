@@ -24,15 +24,7 @@ public class InfoCameraCommand implements CommandExecutor {
             throw new CommandException(Text.of("Unknown Camera"));
         }
 
-        src.sendMessage(
-                Text.of("Camera Info - ", cam.getName(), Text.NEW_LINE,
-                        "Id: ", cam.getId(), Text.NEW_LINE,
-                        "Permission: ", cam.getPermission(), Text.NEW_LINE,
-                        "World: ", cam.getLocation().getExtent().getName(), Text.NEW_LINE,
-                        "Position: ", cam.getLocation().getX(),
-                        "/", cam.getLocation().getY(),
-                        "/", cam.getLocation().getZ())
-        );
+        src.sendMessage(plugin.translations.CAMERA_INFO, cam.templateVariables());
 
         return CommandResult.success();
     }

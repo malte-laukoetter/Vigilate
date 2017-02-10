@@ -24,9 +24,11 @@ public class ReloadCommand implements CommandExecutor {
         try {
             plugin.getConfig().reload();
 
-            src.sendMessage(Text.of(TextColors.RED, "Reloaded Vigilate"));
+            plugin.getLogger().info("Reloaded Vigilate");
+            src.sendMessage(plugin.translations.RELOADED);
         } catch (ObjectMappingException | IOException e) {
-            src.sendMessage(Text.of(TextColors.RED, "Couldn't reload Vigilate!"));
+            plugin.getLogger().info("Failed to Reloaded Vigilate");
+            src.sendMessage(plugin.translations.RELOAD_FAILED);
             e.printStackTrace();
         }
 

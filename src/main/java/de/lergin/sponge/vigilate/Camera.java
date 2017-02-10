@@ -1,5 +1,6 @@
 package de.lergin.sponge.vigilate;
 
+import com.google.common.collect.ImmutableMap;
 import de.lergin.sponge.vigilate.data.ViewerData;
 import de.lergin.sponge.vigilate.data.VigilateKeys;
 import de.lergin.sponge.vigilate.data.ViewerDataManipulatorBuilder;
@@ -11,6 +12,7 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.TextElement;
 import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -19,7 +21,6 @@ import java.util.Optional;
 
 @ConfigSerializable
 public class Camera {
-    @Setting(value = "location", comment = "Location of the camera")
     private Location<World> loc;
     @Setting(value = "name", comment = "Name of the camera")
     private Text name;
@@ -28,8 +29,10 @@ public class Camera {
     @Setting(value = "permission", comment = "Permission needed to use the camera")
     private String permission;
 
-    public Camera(){
+    private Vigilate plugin;
 
+    public Camera(){
+        plugin = Vigilate.getInstance();
     }
 
     public Camera(Location<World> loc, String id) {
@@ -37,6 +40,7 @@ public class Camera {
         this.id = id.toLowerCase();
 
         Vigilate.getInstance().getCameras().put(id, this);
+        plugin = Vigilate.getInstance();
     }
 
     public Location<World> getLocation() {
@@ -137,10 +141,17 @@ public class Camera {
 
         player.setLocation(this.getLocation());
 
-        Title title = Title.builder().fadeIn(20).fadeOut(20).title(Text.EMPTY).subtitle(Text.of("Click to go back!")).stay(100000).build();
+        System.out.println(plugin);
+
+        Title title = Title.builder()
+                .fadeIn(20)
+                .fadeOut(20)
+                .subtitle(plugin.translations.CAMERA_VIEW_TITLE.apply(this.templateVariables()).toText())
+                .stay(100000)
+                .build();
         player.sendTitle(title);
 
-        player.sendMessage(Text.of("Viewing Camera: ", this.getName()));
+        player.sendMessage(plugin.translations.CAMERA_VIEW, this.templateVariables());
     }
 
     public void endViewCamera(Player player){
@@ -148,11 +159,24 @@ public class Camera {
 
         if (cameraId.isPresent() && !cameraId.get().equals("")) {
             Camera.resetPlayer(player);
+            player.sendMessage(plugin.translations.CAMERA_ENDVIEW, this.templateVariables());
         }
     }
 
     public Boolean canUseCamera(CommandSource src){
         return this.getPermission().equals("") || src.hasPermission(this.getPermission());
+    }
+
+    public ImmutableMap<String, TextElement> templateVariables(){
+        return ImmutableMap.<String, TextElement>builder()
+                .put("camera.id", Text.of(this.getId()))
+                .put("camera.name", this.getName())
+                .put("camera.permission", Text.of(this.getPermission()))
+                .put("camera.world", Text.of(this.getLocation().getExtent().getName()))
+                .put("camera.x", Text.of(this.getLocation().getX()))
+                .put("camera.y", Text.of(this.getLocation().getY()))
+                .put("camera.z", Text.of(this.getLocation().getY()))
+                .build();
     }
 
     static public void resetPlayer(Player player){
@@ -197,6 +221,5 @@ public class Camera {
         }
 
         player.clearTitle();
-        player.sendMessage(Text.of("Ended Camera view"));
     }
 }

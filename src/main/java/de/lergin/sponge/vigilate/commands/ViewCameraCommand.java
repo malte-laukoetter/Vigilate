@@ -24,7 +24,7 @@ public class ViewCameraCommand implements CommandExecutor {
 
             cam.viewCamera((Player) src);
         } else {
-            throw new CommandException(Text.of("Only Players can view Cameras"));
+            throw new CommandException(plugin.translations.CAMERA_VIEW_NO_PLAYER);
         }
 
         return CommandResult.success();

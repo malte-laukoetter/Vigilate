@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import de.lergin.sponge.vigilate.bstats.Metrics;
 import de.lergin.sponge.vigilate.commands.CommandRegister;
 import de.lergin.sponge.vigilate.config.Config;
+import de.lergin.sponge.vigilate.config.TranslationConfig;
 import de.lergin.sponge.vigilate.data.ImmutableViewerDataManipulator;
 import de.lergin.sponge.vigilate.data.ViewerData;
 import de.lergin.sponge.vigilate.data.ViewerDataManipulatorBuilder;
@@ -89,6 +90,8 @@ public class Vigilate {
         return config;
     }
 
+    public TranslationConfig translations;
+
     @Listener
     public void onGamePreInitialization(GamePreInitializationEvent event) throws IOException, ObjectMappingException {
         config = new Config(this, loader, path);
@@ -96,6 +99,7 @@ public class Vigilate {
                 new ViewerDataManipulatorBuilder());
 
         config.load();
+        config.loadTranslations();
     }
 
     @Listener

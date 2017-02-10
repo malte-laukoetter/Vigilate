@@ -9,23 +9,23 @@ import org.spongepowered.api.text.Text;
 public class CommandRegister {
     public static void registerCommands(Vigilate plugin){
         CommandSpec createCameraCommand = CommandSpec.builder()
-                .description(Text.of("Creates a new Camera"))
+                .description(plugin.translations.COMMAND_CREATE)
                 .permission("vigilate.create")
                 .arguments(
                         GenericArguments.string(Text.of("id")),
-                        GenericArguments.string(Text.of("Name")),
+                        GenericArguments.string(Text.of("name")),
                         GenericArguments.optional(
-                                GenericArguments.location(Text.of("Location"))
+                                GenericArguments.location(Text.of("location"))
                         ),
                         GenericArguments.optional(
-                                GenericArguments.string(Text.of("Permission"))
+                                GenericArguments.string(Text.of("permission"))
                         )
                 )
                 .executor(new CreateCameraCommand(plugin))
                 .build();
 
         CommandSpec deleteCameraCommand = CommandSpec.builder()
-                .description(Text.of("Deletes a Camera"))
+                .description(plugin.translations.COMMAND_DELETE)
                 .permission("vigilate.delete")
                 .arguments(
                         new CameraCommandArgument(Text.of("camera"), plugin)
@@ -34,7 +34,7 @@ public class CommandRegister {
                 .build();
 
         CommandSpec viewCameraCommand = CommandSpec.builder()
-                .description(Text.of("Views a Camera"))
+                .description(plugin.translations.COMMAND_VIEW)
                 .permission("vigilate.view")
                 .arguments(
                         new CameraCommandArgument(Text.of("camera"), plugin)
@@ -43,7 +43,7 @@ public class CommandRegister {
                 .build();
 
         CommandSpec infoCameraCommand = CommandSpec.builder()
-                .description(Text.of("Shows Infos about a Camera"))
+                .description(plugin.translations.COMMAND_INFO)
                 .permission("vigilate.info")
                 .arguments(
                         new CameraCommandArgument(Text.of("camera"), plugin)
@@ -52,13 +52,13 @@ public class CommandRegister {
                 .build();
 
         CommandSpec listCamerasCommand = CommandSpec.builder()
-                .description(Text.of("List all Cameras"))
+                .description(plugin.translations.COMMAND_LIST)
                 .permission("vigilate.list")
                 .executor(new ListCamerasCommand(plugin))
                 .build();
 
         CommandSpec reloadCommand = CommandSpec.builder()
-                .description(Text.of("Reloads the Configuration"))
+                .description(plugin.translations.COMMAND_RELOAD)
                 .permission("vigilate.reload")
                 .executor(new ReloadCommand(plugin))
                 .build();
